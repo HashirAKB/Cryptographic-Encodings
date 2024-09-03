@@ -109,22 +109,22 @@ export default function EncodersAndDecoders() {
       switch (method) {
         case 'asciiToBytes':
           result = asciiToBytes(input)
-          steps = input.split('').map((char, index) => `'${char}' (ASCII ${char.charCodeAt(0)})`)
+          steps = input.split('').map((char) => `'${char}' (ASCII ${char.charCodeAt(0)})`)
           setExplanation(`1. Split the input string into characters\n2. Convert each character to its ASCII value:\n   ${steps.join('\n   ')}\n3. Combine the ASCII values into an array`)
           break
         case 'bytesToAscii':
           result = bytesToAscii(JSON.parse(input))
-          steps = JSON.parse(input).map(byte => `${byte} (ASCII '${String.fromCharCode(byte)}')`)
+          steps = JSON.parse(input).map((byte: number) => `${byte} (ASCII '${String.fromCharCode(byte)}')`)
           setExplanation(`1. Parse the input as a JSON array\n2. Convert each byte to its ASCII character:\n   ${steps.join('\n   ')}\n3. Join the characters into a string`)
           break
         case 'arrayToHex':
           result = arrayToHex(JSON.parse(input))
-          steps = JSON.parse(input).map(byte => `${byte} -> ${byte.toString(16).padStart(2, '0')}`)
+          steps = JSON.parse(input).map((byte: number) => `${byte} -> ${byte.toString(16).padStart(2, '0')}`)
           setExplanation(`1. Parse the input as a JSON array\n2. Convert each byte to a two-digit hexadecimal string:\n   ${steps.join('\n   ')}\n3. Join the hexadecimal strings`)
           break
         case 'hexToArray':
           result = hexToArray(input)
-          steps = input.match(/.{1,2}/g).map(hex => `${hex} -> ${parseInt(hex, 16)}`)
+          steps = input?.match(/.{1,2}/g)?.map(hex => `${hex} -> ${parseInt(hex, 16)}`) || [];
           setExplanation(`1. Split the input into pairs of characters\n2. Convert each pair from hexadecimal to decimal:\n   ${steps.join('\n   ')}\n3. Combine the decimal values into an array`)
           break
         case 'arrayToBase64':
