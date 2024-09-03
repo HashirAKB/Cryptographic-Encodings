@@ -57,12 +57,13 @@ const methodDescriptions = {
   aesDecrypt: "Decrypts AES encrypted ciphertext using the provided key"
 }
 
-export default function EncodingDemo() {
+export default function EncodersAndDecoders() {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [method, setMethod] = useState('asciiToBytes')
   const [placeholder, setPlaceholder] = useState('Enter text')
   const [key, setKey] = useState('')
+  const [explanation, setExplanation] = useState('')
   const { theme, setTheme } = useTheme()
 
   useEffect(() => {
@@ -102,43 +103,61 @@ export default function EncodingDemo() {
 
   const handleEncodeDecode = () => {
     try {
+      let result
+      let steps = []
+
       switch (method) {
         case 'asciiToBytes':
-          setOutput(JSON.stringify(asciiToBytes(input)))
+          result = asciiToBytes(input)
+          steps = input.split('').map((char, index) => `'${char}' (ASCII ${char.charCodeAt(0)})`)
+          setExplanation(`1. Split the input string into characters\n2. Convert each character to its ASCII value:\n   ${steps.join('\n   ')}\n3. Combine the ASCII values into an array`)
           break
         case 'bytesToAscii':
-          setOutput(bytesToAscii(JSON.parse(input)))
+          result = bytesToAscii(JSON.parse(input))
+          steps = JSON.parse(input).map(byte => `${byte} (ASCII '${String.fromCharCode(byte)}')`)
+          setExplanation(`1. Parse the input as a JSON array\n2. Convert each byte to its ASCII character:\n   ${steps.join('\n   ')}\n3. Join the characters into a string`)
           break
         case 'arrayToHex':
-          setOutput(arrayToHex(JSON.parse(input)))
+          result = arrayToHex(JSON.parse(input))
+          steps = JSON.parse(input).map(byte => `${byte} -> ${byte.toString(16).padStart(2, '0')}`)
+          setExplanation(`1. Parse the input as a JSON array\n2. Convert each byte to a two-digit hexadecimal string:\n   ${steps.join('\n   ')}\n3. Join the hexadecimal strings`)
           break
         case 'hexToArray':
-          setOutput(JSON.stringify(hexToArray(input)))
+          result = hexToArray(input)
+          steps = input.match(/.{1,2}/g).map(hex => `${hex} -> ${parseInt(hex, 16)}`)
+          setExplanation(`1. Split the input into pairs of characters\n2. Convert each pair from hexadecimal to decimal:\n   ${steps.join('\n   ')}\n3. Combine the decimal values into an array`)
           break
         case 'arrayToBase64':
-          setOutput(arrayToBase64(JSON.parse(input)))
+          result = arrayToBase64(JSON.parse(input))
+          setExplanation(`1. Parse the input as a JSON array\n2. Convert the array to a string of characters\n3. Encode the string using Base64 encoding`)
           break
         case 'base64ToArray':
-          setOutput(JSON.stringify(base64ToArray(input)))
+          result = base64ToArray(input)
+          setExplanation(`1. Decode the Base64 input string\n2. Convert each character of the decoded string to its ASCII value\n3. Create an array from these ASCII values`)
           break
         case 'aesEncrypt':
-          setOutput(aesEncrypt(input, key))
+          result = aesEncrypt(input, key)
+          setExplanation(`1. Generate a random salt\n2. Derive an encryption key using PBKDF2\n3. Generate a random IV (Initialization Vector)\n4. Encrypt the input using AES in CBC mode\n5. Combine the salt, IV, and ciphertext\n6. Encode the result in Base64`)
           break
         case 'aesDecrypt':
-          setOutput(aesDecrypt(input, key))
+          result = aesDecrypt(input, key)
+          setExplanation(`1. Decode the Base64 input\n2. Extract the salt, IV, and ciphertext\n3. Derive the decryption key using PBKDF2\n4. Decrypt the ciphertext using AES in CBC mode`)
           break
         default:
-          setOutput('Invalid method')
+          result = 'Invalid method'
+          setExplanation('')
       }
+      setOutput(JSON.stringify(result))
     } catch (error) {
       setOutput('Error: Invalid input')
+      setExplanation('An error occurred. Please check your input and try again.')
     }
   }
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg">
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4">
+        <div className="w-full max-w-2xl space-y-6 bg-card rounded-lg shadow-lg p-8">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold">Public Key Cryptography - Encoding/Decoding</h1>
@@ -202,6 +221,15 @@ export default function EncodingDemo() {
               className="p-4 bg-muted rounded-md min-h-[100px] whitespace-pre-wrap break-all"
             >
               {output}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="explanation">How it works</Label>
+            <div
+              id="explanation"
+              className="p-4 bg-muted rounded-md min-h-[100px] whitespace-pre-wrap"
+            >
+              {explanation}
             </div>
           </div>
         </div>
