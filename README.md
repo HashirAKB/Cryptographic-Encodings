@@ -8,11 +8,19 @@ This project is a web application that demonstrates various encoding and decodin
 
 ## Features
 
-- **Encoding and Decoding**: The application supports multiple encoding and decoding formats, including ASCII, byte arrays, hexadecimal, Base64, and Base58.
-- **Theme Toggle**: Users can switch between dark and light themes using a toggle button.
-- **Dynamic Input Placeholders**: The input placeholder dynamically changes based on the selected encoding/decoding method to guide users on the expected input format.
-- **Responsive Design**: The layout is fully responsive, ensuring a seamless experience on both desktop and mobile devices.
-- **Error Handling**: The application includes error handling to catch and inform users of any invalid inputs.
+Here’s the updated **Features** section for the README:
+
+---
+
+## Features
+
+- **Encoding and Decoding**: Supports multiple formats, including ASCII, byte arrays, hexadecimal, Base64, Base58, and now AES encryption and decryption.
+- **Theme Toggle**: Switch between dark and light themes using a toggle button.
+- **Dynamic Input Placeholders**: Input placeholders change based on the selected encoding/decoding method.
+- **Tooltips for Better UX**: Tooltips provide detailed explanations for each method, enhancing user experience.
+- **Responsive Design**: Fully responsive layout for both desktop and mobile devices.
+- **Error Handling**: Comprehensive error handling for invalid inputs.
+
 
 ## Technologies Used
 
