@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 import CryptoJS from 'crypto-js'
@@ -45,7 +46,18 @@ function aesDecrypt(ciphertext: string, key: string): string {
   return bytes.toString(CryptoJS.enc.Utf8)
 }
 
-export default function EncodersAndDecoders() {
+const methodDescriptions = {
+  asciiToBytes: "Converts ASCII text to an array of byte values",
+  bytesToAscii: "Converts an array of byte values to ASCII text",
+  arrayToHex: "Converts an array of byte values to a hexadecimal string",
+  hexToArray: "Converts a hexadecimal string to an array of byte values",
+  arrayToBase64: "Converts an array of byte values to a Base64 encoded string",
+  base64ToArray: "Converts a Base64 encoded string to an array of byte values",
+  aesEncrypt: "Encrypts plaintext using AES (Advanced Encryption Standard) with a provided key",
+  aesDecrypt: "Decrypts AES encrypted ciphertext using the provided key"
+}
+
+export default function EncodingDemo() {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [method, setMethod] = useState('asciiToBytes')
@@ -124,93 +136,76 @@ export default function EncodersAndDecoders() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-      <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold">Public Key Cryptography - Encoding/Decoding</h1>
-            <p className="text-sm text-muted-foreground mt-1">Built as part of #100xDev web3 cohort</p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-          >
-            {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="input">Input</Label>
-            <Input
-              id="input"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={placeholder}
-            />
-          </div>
-          {(method === 'aesEncrypt' || method === 'aesDecrypt') && (
+    <TooltipProvider>
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg">
+          <div className="flex justify-between items-center">
             <div>
-              <Label htmlFor="key">Encryption Key</Label>
+              <h1 className="text-2xl font-bold">Public Key Cryptography - Encoding/Decoding</h1>
+              <p className="text-sm text-muted-foreground mt-1">Built as part of #100xDev web3 cohort</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            >
+              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="input">Input</Label>
               <Input
-                id="key"
-                value={key}
-                onChange={(e) => setKey(e.target.value)}
-                placeholder="Enter encryption key"
+                id="input"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={placeholder}
               />
             </div>
-          )}
-          <RadioGroup value={method} onValueChange={setMethod}>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="asciiToBytes" id="asciiToBytes" />
-                <Label htmlFor="asciiToBytes">ASCII to Bytes</Label>
+            {(method === 'aesEncrypt' || method === 'aesDecrypt') && (
+              <div>
+                <Label htmlFor="key">Encryption Key</Label>
+                <Input
+                  id="key"
+                  value={key}
+                  onChange={(e) => setKey(e.target.value)}
+                  placeholder="Enter encryption key"
+                />
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="bytesToAscii" id="bytesToAscii" />
-                <Label htmlFor="bytesToAscii">Bytes to ASCII</Label>
+            )}
+            <RadioGroup value={method} onValueChange={setMethod}>
+              <div className="flex flex-wrap gap-4">
+                {Object.entries(methodDescriptions).map(([value, description]) => (
+                  <Tooltip key={value}>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value={value} id={value} />
+                        <Label htmlFor={value}>{value}</Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{description}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="arrayToHex" id="arrayToHex" />
-                <Label htmlFor="arrayToHex">Array to Hex</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="hexToArray" id="hexToArray" />
-                <Label htmlFor="hexToArray">Hex to Array</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="arrayToBase64" id="arrayToBase64" />
-                <Label htmlFor="arrayToBase64">Array to Base64</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="base64ToArray" id="base64ToArray" />
-                <Label htmlFor="base64ToArray">Base64 to Array</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="aesEncrypt" id="aesEncrypt" />
-                <Label htmlFor="aesEncrypt">AES Encrypt</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="aesDecrypt" id="aesDecrypt" />
-                <Label htmlFor="aesDecrypt">AES Decrypt</Label>
-              </div>
+            </RadioGroup>
+            <Button onClick={handleEncodeDecode} className="w-full">
+              Encode/Decode
+            </Button>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="output">Output</Label>
+            <div
+              id="output"
+              className="p-4 bg-muted rounded-md min-h-[100px] whitespace-pre-wrap break-all"
+            >
+              {output}
             </div>
-          </RadioGroup>
-          <Button onClick={handleEncodeDecode} className="w-full">
-            Encode/Decode
-          </Button>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="output">Output</Label>
-          <div
-            id="output"
-            className="p-4 bg-muted rounded-md min-h-[100px] whitespace-pre-wrap break-all"
-          >
-            {output}
           </div>
         </div>
       </div>
-    </div>
+    </TooltipProvider>
   )
 }
