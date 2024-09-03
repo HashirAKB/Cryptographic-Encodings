@@ -8,12 +8,6 @@ This project is a web application that demonstrates various encoding and decodin
 
 ## Features
 
-Here’s the updated **Features** section for the README:
-
----
-
-## Features
-
 - **Encoding and Decoding**: Supports multiple formats, including ASCII, byte arrays, hexadecimal, Base64, Base58, and now AES encryption and decryption.
 - **Theme Toggle**: Switch between dark and light themes using a toggle button.
 - **Dynamic Input Placeholders**: Input placeholders change based on the selected encoding/decoding method.
