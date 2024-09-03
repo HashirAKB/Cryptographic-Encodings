@@ -1,4 +1,3 @@
-import '../App.css'
 import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
-
+import CryptoJS from 'crypto-js'
 
 // Encoding/decoding functions
 function bytesToAscii(byteArray: number[]): string {
@@ -37,11 +36,21 @@ function base64ToArray(base64String: string): number[] {
   return Array.from(atob(base64String), char => char.charCodeAt(0))
 }
 
-function EncodersAndDecoders() {
+function aesEncrypt(message: string, key: string): string {
+  return CryptoJS.AES.encrypt(message, key).toString()
+}
+
+function aesDecrypt(ciphertext: string, key: string): string {
+  const bytes = CryptoJS.AES.decrypt(ciphertext, key)
+  return bytes.toString(CryptoJS.enc.Utf8)
+}
+
+export default function EncodersAndDecoders() {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [method, setMethod] = useState('asciiToBytes')
   const [placeholder, setPlaceholder] = useState('Enter text')
+  const [key, setKey] = useState('')
   const { theme, setTheme } = useTheme()
 
   useEffect(() => {
@@ -68,6 +77,12 @@ function EncodersAndDecoders() {
       case 'base64ToArray':
         setPlaceholder('Enter Base64 string (e.g., "SGVsbG8=")')
         break
+      case 'aesEncrypt':
+        setPlaceholder('Enter text to encrypt')
+        break
+      case 'aesDecrypt':
+        setPlaceholder('Enter ciphertext to decrypt')
+        break
       default:
         setPlaceholder('Enter input')
     }
@@ -93,6 +108,12 @@ function EncodersAndDecoders() {
           break
         case 'base64ToArray':
           setOutput(JSON.stringify(base64ToArray(input)))
+          break
+        case 'aesEncrypt':
+          setOutput(aesEncrypt(input, key))
+          break
+        case 'aesDecrypt':
+          setOutput(aesDecrypt(input, key))
           break
         default:
           setOutput('Invalid method')
@@ -129,6 +150,17 @@ function EncodersAndDecoders() {
               placeholder={placeholder}
             />
           </div>
+          {(method === 'aesEncrypt' || method === 'aesDecrypt') && (
+            <div>
+              <Label htmlFor="key">Encryption Key</Label>
+              <Input
+                id="key"
+                value={key}
+                onChange={(e) => setKey(e.target.value)}
+                placeholder="Enter encryption key"
+              />
+            </div>
+          )}
           <RadioGroup value={method} onValueChange={setMethod}>
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center space-x-2">
@@ -155,6 +187,14 @@ function EncodersAndDecoders() {
                 <RadioGroupItem value="base64ToArray" id="base64ToArray" />
                 <Label htmlFor="base64ToArray">Base64 to Array</Label>
               </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="aesEncrypt" id="aesEncrypt" />
+                <Label htmlFor="aesEncrypt">AES Encrypt</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="aesDecrypt" id="aesDecrypt" />
+                <Label htmlFor="aesDecrypt">AES Decrypt</Label>
+              </div>
             </div>
           </RadioGroup>
           <Button onClick={handleEncodeDecode} className="w-full">
@@ -174,5 +214,3 @@ function EncodersAndDecoders() {
     </div>
   )
 }
-
-export default EncodersAndDecoders
